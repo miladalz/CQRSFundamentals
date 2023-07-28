@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ordering.Domain", "Ordering
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ordering.Infrastructure", "Ordering.Infrastructure\Ordering.Infrastructure.csproj", "{F22F9B1A-F349-4B91-A2C4-EE7EA7E9D9CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ordering.API", "Ordering.API\Ordering.API.csproj", "{7C506825-D6AD-4E72-B2CA-CEDF2B0D4810}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F22F9B1A-F349-4B91-A2C4-EE7EA7E9D9CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F22F9B1A-F349-4B91-A2C4-EE7EA7E9D9CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F22F9B1A-F349-4B91-A2C4-EE7EA7E9D9CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C506825-D6AD-4E72-B2CA-CEDF2B0D4810}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C506825-D6AD-4E72-B2CA-CEDF2B0D4810}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C506825-D6AD-4E72-B2CA-CEDF2B0D4810}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C506825-D6AD-4E72-B2CA-CEDF2B0D4810}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
