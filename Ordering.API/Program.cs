@@ -7,6 +7,7 @@ using Ordering.Infrastructure.Repositories;
 using System.Reflection;
 using FluentValidation.AspNetCore;
 using Ordering.API.Infrastructure;
+using Ordering.API.Application.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
+
 builder.Services.AddDbContext<OrderingContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionString"]);
@@ -21,6 +23,8 @@ builder.Services.AddDbContext<OrderingContext>(options =>
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBuyerRepository, BuyerRepository>();
 builder.Services.AddTransient<OrderingContextSeed>();
+var connectionString = new ConnectionString(builder.Configuration["ConnectionString"]);
+builder.Services.AddSingleton(connectionString);
 
 builder.Services.AddControllers()
     .AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssembly(typeof(Program).Assembly));

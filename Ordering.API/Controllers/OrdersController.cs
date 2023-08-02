@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.API.Application.Commands;
 using Ordering.API.Application.DTOs;
+using Ordering.API.Application.Queries;
 using System;
 using System.Threading.Tasks;
 
@@ -28,6 +29,13 @@ namespace Ordering.API.Controllers
                 return BadRequest(result.Error);
             }
             return Ok();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Result>> GetOrderByIdAsync([FromRoute] int id)
+        {
+            var order = await _mediator.Send(new GetOrderByIdQuery(id));
+            return Ok(order.Value);
         }
     }
 }
