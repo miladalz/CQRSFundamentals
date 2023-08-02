@@ -8,23 +8,32 @@ using System.Reflection;
 using FluentValidation.AspNetCore;
 using Ordering.API.Infrastructure;
 using Ordering.API.Application.Models;
+using Ordering.API.Application.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-
+//Add services to the container.
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
 
+//ef core db context
 builder.Services.AddDbContext<OrderingContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionString"]);
 });
+
+//Repository injection
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBuyerRepository, BuyerRepository>();
+
+
 builder.Services.AddTransient<OrderingContextSeed>();
+
+//connectionString for dapper
 var connectionString = new ConnectionString(builder.Configuration["ConnectionString"]);
 builder.Services.AddSingleton(connectionString);
+
+//Behaviors
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
 builder.Services.AddControllers()
     .AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssembly(typeof(Program).Assembly));
@@ -43,6 +52,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//Data Seed
 using (var scope = app.Services.CreateScope())
 {
     scope.ServiceProvider.GetService<OrderingContextSeed>().SeedAsync().Wait();
