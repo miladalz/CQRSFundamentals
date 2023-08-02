@@ -26,6 +26,8 @@ namespace Ordering.Infrastructure.EntityConfigurations
             .IsUnique(true);
 
             buyerConfiguration.Property(b => b.Name);
+
+            buyerConfiguration.Ignore(b => b.DomainEvents);
         }
     }
 }

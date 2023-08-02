@@ -54,6 +54,8 @@ namespace Ordering.Infrastructure.EntityConfigurations
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .HasColumnName("PictureUrl")
             .IsRequired(false);
+
+            orderItemConfiguration.Ignore(b => b.DomainEvents);
         }
     }
 }

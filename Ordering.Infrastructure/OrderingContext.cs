@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
 using Ordering.Domain.AggregatesModel.BuyerAggregate;
 using Ordering.Domain.AggregatesModel.OrderAggregate;
 using Ordering.Domain.SeedWork;
@@ -14,15 +15,17 @@ namespace Ordering.Infrastructure
     public class OrderingContext : DbContext, IUnitOfWork
     {
         public const string DEFAULT_SCHEMA = "Ordering";
+        private IMediator _mediator;
         private IDbContextTransaction _currentTransaction;
-
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Buyer> Buyers { get; set; }
         public DbSet<OrderStatus> OrderStatus { get; set; }
-
         public OrderingContext(DbContextOptions<OrderingContext> options) : base(options) { }
-
+        public OrderingContext(DbContextOptions<OrderingContext> options, IMediator mediator) : base(options)
+        {
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new OrderEntityTypeConfiguration());
@@ -30,7 +33,6 @@ namespace Ordering.Infrastructure
             modelBuilder.ApplyConfiguration(new OrderStatusEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new BuyerEntityTypeConfiguration());
         }
-
         public IDbContextTransaction GetCurrentTransaction() => _currentTransaction;
         public bool HasActiveTransaction => _currentTransaction != null;
         public async Task<IDbContextTransaction> BeginTransactionAsync()
@@ -39,7 +41,6 @@ namespace Ordering.Infrastructure
             _currentTransaction = await Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
             return _currentTransaction;
         }
-
         public async Task CommitTransactionAsync(IDbContextTransaction transaction)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
@@ -63,7 +64,6 @@ namespace Ordering.Infrastructure
                 }
             }
         }
-
         public void RollbackTransaction()
         {
             try
@@ -81,6 +81,7 @@ namespace Ordering.Infrastructure
         }
         public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
+            await _mediator.DispatchDomainEventsAsync(this);
             var result = await base.SaveChangesAsync(cancellationToken);
             return true;
         }

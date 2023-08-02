@@ -1,8 +1,8 @@
-﻿using Ordering.Domain.SeedWork;
+﻿using Ordering.Domain.Events;
+using Ordering.Domain.SeedWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Ordering.Domain.AggregatesModel.OrderAggregate
 {
@@ -36,8 +36,15 @@ namespace Ordering.Domain.AggregatesModel.OrderAggregate
             _orderStatusId = OrderStatus.Submitted.Id;
             _orderDate = DateTime.UtcNow;
             Address = address;
+            AddOrderStartedDomainEvent(userId, userName);
         }
-        public void AddOrderItem(int productId, string productName, decimal unitPrice, decimal discount, string pictureUrl, int units = 1)
+        private void AddOrderStartedDomainEvent(string userId, string userName)
+        {
+            var orderStartedDomainEvent = new OrderStartedDomainEvent(this, userId, userName);
+            this.AddDomainEvent(orderStartedDomainEvent);
+        }
+        public void AddOrderItem(int productId, string productName,
+        decimal unitPrice, decimal discount, string pictureUrl, int units = 1)
         {
             var existingOrderForProduct = _orderItems.Where(o => o.ProductId == productId).SingleOrDefault();
             if (existingOrderForProduct != null)
@@ -54,7 +61,6 @@ namespace Ordering.Domain.AggregatesModel.OrderAggregate
                 _orderItems.Add(orderItem);
             }
         }
-
         public void SetBuyerId(int id)
         {
             _buyerId = id;
@@ -74,7 +80,6 @@ namespace Ordering.Domain.AggregatesModel.OrderAggregate
                 _description = "All the items were confirmed with available stock.";
             }
         }
-
         public void SetPaidStatus()
         {
             if (_orderStatusId == OrderStatus.StockConfirmed.Id)
@@ -83,7 +88,6 @@ namespace Ordering.Domain.AggregatesModel.OrderAggregate
                 _description = "The payment was performed at a simulated \"American Bank checking bank account ending on XX35071\"";
             }
         }
-
         public void SetShippedStatus()
         {
             if (_orderStatusId != OrderStatus.Paid.Id)
@@ -103,7 +107,6 @@ namespace Ordering.Domain.AggregatesModel.OrderAggregate
             _orderStatusId = OrderStatus.Cancelled.Id;
             _description = $"The order was cancelled.";
         }
-
         public void SetCancelledStatusWhenStockIsRejected(IEnumerable<int> orderStockRejectedItems)
         {
             if (_orderStatusId == OrderStatus.AwaitingValidation.Id)
@@ -116,7 +119,6 @@ namespace Ordering.Domain.AggregatesModel.OrderAggregate
                 _description = $"The product items don't have stock: ({itemsStockRejectedDescription}).";
             }
         }
-
         private void StatusChangeException(OrderStatus orderStatusToChange)
         {
             throw new Exception($"Is not possible to change the order status from {OrderStatus.Name} to {orderStatusToChange.Name}.");

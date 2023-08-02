@@ -56,6 +56,8 @@ namespace Ordering.Infrastructure.EntityConfigurations
             orderConfiguration.HasOne(o => o.OrderStatus)
             .WithMany()
             .HasForeignKey("_orderStatusId");
+
+            orderConfiguration.Ignore(b => b.DomainEvents);
         }
     }
 }
